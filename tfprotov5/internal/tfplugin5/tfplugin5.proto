@@ -90,6 +90,7 @@ message Schema {
     message Attribute {
         string name = 1;
         bytes type = 2;
+        NestedBlock nested_block = 10;
         string description = 3;
         bool required = 4;
         bool optional = 5;

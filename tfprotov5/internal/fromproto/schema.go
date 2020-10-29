@@ -52,11 +52,23 @@ func SchemaAttribute(in *tfplugin5.Schema_Attribute) (*tfprotov5.SchemaAttribute
 		DescriptionKind: StringKind(in.DescriptionKind),
 		Deprecated:      in.Deprecated,
 	}
-	typ, err := tftypes.ParseJSONType(in.Type) //nolint:staticcheck
-	if err != nil {
-		return resp, err
+
+	if in.Type != nil {
+		typ, err := tftypes.ParseJSONType(in.Type) //nolint:staticcheck
+		if err != nil {
+			return resp, err
+		}
+		resp.Type = typ
 	}
-	resp.Type = typ
+
+	if in.NestedBlock != nil {
+		nb, err := SchemaNestedBlock(in.NestedBlock)
+		if err != nil {
+			return resp, err
+		}
+		resp.NestedBlock = nb
+	}
+
 	return resp, nil
 }
 

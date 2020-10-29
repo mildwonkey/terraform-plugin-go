@@ -119,6 +119,10 @@ type SchemaAttribute struct {
 	// are supported and their behaviors.
 	Type tftypes.Type
 
+	// NestedBlock indicates that this is a nested block masquerading as an
+	// attribute. This field conflicts with Type.
+	NestedBlock *SchemaNestedBlock
+
 	// Description offers an end-user friendly description of what the
 	// attribute is for. This will be surfaced to users through editor
 	// integrations, documentation generation, and other settings.

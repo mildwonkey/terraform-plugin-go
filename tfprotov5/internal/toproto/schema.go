@@ -51,11 +51,22 @@ func Schema_Attribute(in *tfprotov5.SchemaAttribute) (*tfplugin5.Schema_Attribut
 		DescriptionKind: StringKind(in.DescriptionKind),
 		Deprecated:      in.Deprecated,
 	}
-	t, err := CtyType(in.Type)
-	if err != nil {
-		return resp, fmt.Errorf("error marshaling type to JSON: %w", err)
+
+	if in.Type != nil {
+		t, err := CtyType(in.Type)
+		if err != nil {
+			return resp, fmt.Errorf("error marshaling type to JSON: %w", err)
+		}
+		resp.Type = t
 	}
-	resp.Type = t
+
+	if in.NestedBlock != nil {
+		nb, err := Schema_NestedBlock(in.NestedBlock)
+		if err != nil {
+			return resp, err
+		}
+		resp.NestedBlock = nb
+	}
 	return resp, nil
 }
 
