@@ -237,7 +237,7 @@ func marshalMsgPackObject(val Value, typ Type, p AttributePath, enc *msgpack.Enc
 		ty := types[k]
 		v, ok := o[k]
 		if !ok {
-			return p.NewErrorf("no value set")
+			return p.NewErrorf("no value set for %s", k)
 		}
 		err := marshalMsgPack(NewValue(String, k), String, p, enc)
 		if err != nil {
