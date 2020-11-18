@@ -9,6 +9,7 @@ import "encoding/json"
 // attribute names or types are considered to be distinct types.
 type Object struct {
 	AttributeTypes map[string]Type
+	OptionalAttrs  []string
 }
 
 // Is returns whether `t` is an Object type or not. If `t` is an instance of
@@ -52,5 +53,15 @@ func (o Object) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	optionalAttrs, err := json.Marshal(o.OptionalAttrs)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(optionalAttrs) > 0 {
+		return []byte(`["object",` + string(attrs) + "," + string(optionalAttrs) + `]`), nil
+	}
+
 	return []byte(`["object",` + string(attrs) + `]`), nil
 }
