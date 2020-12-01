@@ -119,9 +119,9 @@ type SchemaAttribute struct {
 	// are supported and their behaviors.
 	Type tftypes.Type
 
-	// NestedBlock indicates that this is a nested block masquerading as an
-	// attribute. This field conflicts with Type.
-	NestedBlock *SchemaNestedBlock
+	// NestedType indicates that this is a NestedBlock-style object masquerading
+	// as an attribute. This field conflicts with Type.
+	NestedType *SchemaNestedType
 
 	// Description offers an end-user friendly description of what the
 	// attribute is for. This will be surfaced to users through editor
@@ -164,6 +164,49 @@ type SchemaAttribute struct {
 	// experiences. Providers should set it when deprecating attributes in
 	// preparation for these tools.
 	Deprecated bool
+}
+
+// SchemaNestedType is a nested block within an Attribute. See SchemaAttribute
+// for more information on blocks.
+type SchemaNestedType struct {
+	// Object is the object being nested inside another Attribute. See the
+	// SchemaAttribute documentation for more information on Attributes.
+	Object *SchemaObject
+
+	// Nesting is the kind of nesting the block is using. Different nesting
+	// modes have different behaviors and imply different kinds of data.
+	Nesting SchemaNestedBlockNestingMode
+
+	// MinItems is the minimum number of instances of this block that a
+	// user must specify or Terraform will return an error.
+	//
+	// MinItems can only be set for SchemaNestedBlockNestingModeList and
+	// SchemaNestedBlockNestingModeSet. SchemaNestedBlockNestingModeSingle
+	// can also set MinItems and MaxItems both to 1 to indicate that the
+	// block is required to be set. All other SchemaNestedBlockNestingModes
+	// must leave MinItems set to 0.
+	MinItems int64
+
+	// MaxItems is the maximum number of instances of this block that a
+	// user may specify before Terraform returns an error.
+	//
+	// MaxItems can only be set for SchemaNestedBlockNestingModeList and
+	// SchemaNestedBlockNestingModeSet. SchemaNestedBlockNestingModeSingle
+	// can also set MinItems and MaxItems both to 1 to indicate that the
+	// block is required to be set. All other SchemaNestedBlockNestingModes
+	// must leave MaxItems set to 0.
+	MaxItems int64
+}
+
+// SchemaObject represents a block-stype object in an Attribute.
+//
+// Blocks will show up in state and config Values as a tftypes.Object, with the
+// attributes and nested blocks defining the tftypes.Object's AttributeTypes.
+type SchemaObject struct {
+	Version int64
+
+	// Attributes are the attributes defined within the Object.
+	Attributes []*SchemaAttribute
 }
 
 // SchemaNestedBlock is a nested block within another block. See SchemaBlock

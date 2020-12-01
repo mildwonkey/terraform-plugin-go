@@ -61,12 +61,12 @@ func SchemaAttribute(in *tfplugin5.Schema_Attribute) (*tfprotov5.SchemaAttribute
 		resp.Type = typ
 	}
 
-	if in.NestedBlock != nil {
-		nb, err := SchemaNestedBlock(in.NestedBlock)
+	if in.NestedType != nil {
+		nb, err := SchemaNestedType(in.NestedType)
 		if err != nil {
 			return resp, err
 		}
-		resp.NestedBlock = nb
+		resp.NestedType = nb
 	}
 
 	return resp, nil
@@ -123,4 +123,33 @@ func SchemaNestedBlocks(in []*tfplugin5.Schema_NestedBlock) ([]*tfprotov5.Schema
 
 func SchemaNestedBlockNestingMode(in tfplugin5.Schema_NestedBlock_NestingMode) tfprotov5.SchemaNestedBlockNestingMode {
 	return tfprotov5.SchemaNestedBlockNestingMode(in)
+}
+
+func SchemaNestedTypeNestingMode(in tfplugin5.Schema_NestedType_NestingMode) tfprotov5.SchemaNestedBlockNestingMode {
+	return tfprotov5.SchemaNestedBlockNestingMode(in)
+}
+
+func SchemaNestedType(in *tfplugin5.Schema_NestedType) (*tfprotov5.SchemaNestedType, error) {
+	resp := &tfprotov5.SchemaNestedType{
+		Nesting:  SchemaNestedTypeNestingMode(in.Nesting),
+		MinItems: in.MinItems,
+		MaxItems: in.MaxItems,
+	}
+
+	if in.Object != nil {
+		obj, err := SchemaObject(in.Object)
+		if err != nil {
+			return resp, err
+		}
+		resp.Object = obj
+	}
+	return resp, nil
+}
+
+func SchemaObject(in *tfplugin5.Schema_Object) (*tfprotov5.SchemaObject, error) {
+	attrs, err := SchemaAttributes(in.Attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &tfprotov5.SchemaObject{Attributes: attrs}, nil
 }

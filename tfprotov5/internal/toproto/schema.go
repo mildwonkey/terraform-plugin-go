@@ -60,12 +60,12 @@ func Schema_Attribute(in *tfprotov5.SchemaAttribute) (*tfplugin5.Schema_Attribut
 		resp.Type = t
 	}
 
-	if in.NestedBlock != nil {
-		nb, err := Schema_NestedBlock(in.NestedBlock)
+	if in.NestedType != nil {
+		nb, err := Schema_NestedType(in.NestedType)
 		if err != nil {
 			return resp, err
 		}
-		resp.NestedBlock = nb
+		resp.NestedType = nb
 	}
 	return resp, nil
 }
@@ -121,6 +121,34 @@ func Schema_NestedBlocks(in []*tfprotov5.SchemaNestedBlock) ([]*tfplugin5.Schema
 
 func Schema_NestedBlock_NestingMode(in tfprotov5.SchemaNestedBlockNestingMode) tfplugin5.Schema_NestedBlock_NestingMode {
 	return tfplugin5.Schema_NestedBlock_NestingMode(in)
+}
+
+func Schema_NestedType_NestingMode(in tfprotov5.SchemaNestedBlockNestingMode) tfplugin5.Schema_NestedType_NestingMode {
+	return tfplugin5.Schema_NestedType_NestingMode(in)
+}
+
+func Schema_NestedType(in *tfprotov5.SchemaNestedType) (*tfplugin5.Schema_NestedType, error) {
+	resp := &tfplugin5.Schema_NestedType{
+		Nesting:  Schema_NestedType_NestingMode(in.Nesting),
+		MinItems: in.MinItems,
+		MaxItems: in.MaxItems,
+	}
+	if in.Object != nil {
+		obj, err := Schema_Object(in.Object)
+		if err != nil {
+			return resp, fmt.Errorf("error marshaling nested block: %w", err)
+		}
+		resp.Object = obj
+	}
+	return resp, nil
+}
+
+func Schema_Object(in *tfprotov5.SchemaObject) (*tfplugin5.Schema_Object, error) {
+	attrs, err := Schema_Attributes(in.Attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &tfplugin5.Schema_Object{Attributes: attrs}, nil
 }
 
 // we have to say this next thing to get golint to stop yelling at us about the
